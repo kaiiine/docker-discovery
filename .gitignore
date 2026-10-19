@@ -1,0 +1,28 @@
+# Secrets (garde .env.example, lui est commité)
+.env
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.log
+
+# Python (flask-app)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE / éditeurs
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Zip / sources du prof, inutiles dans ton dépôt
+simple-api-student/
+*.zip

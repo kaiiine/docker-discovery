@@ -20,3 +20,39 @@ jobs:
       - name: Build and test with Maven
         run: mvn -B clean verify
         working-directory: simpleapi
+
+  build-and-push:
+    needs: test-backend
+    runs-on: ubuntu-24.04
+    steps: 
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+
+      - name: Builder image and push simpleapi
+        uses: docker/build-push-action@v6
+        with:
+          context: ./simpleapi
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/simpleapi:latest
+       
+      - name: Builder image and push database   
+        uses: docker/build-push-action@v6
+        with:
+          context: ./db
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/database:latest
+
+
+      - name: Builder image and push http
+        uses: docker/build-push-action@v6
+        with:
+          context: ./http-server
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/httpserver:latest
+
+
+

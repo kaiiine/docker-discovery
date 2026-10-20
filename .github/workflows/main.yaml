@@ -19,7 +19,11 @@ jobs:
 
       - name: Build and test with Maven
         run: mvn -B clean verify
-        working-directory: simpleapi
+        working-directory: ./simpleapi
+
+      - name: Build and test with sonar
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORGANISATION_KEY }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./simple-api/pom.xml
+        working-directory: ./simpleapi
 
   build-and-push:
     needs: test-backend

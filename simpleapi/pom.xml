@@ -18,6 +18,7 @@
 		<jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
 		<testcontainers.version>1.20.4</testcontainers.version>
 		<validation.version>3.1.0</validation.version>
+		<testcontainers.version>1.21.4</testcontainers.version>
 	</properties>
 
 	<dependencies>

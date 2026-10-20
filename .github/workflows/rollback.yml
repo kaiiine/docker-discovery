@@ -1,0 +1,38 @@
+name: Rollback
+on:
+  workflow_dispatch:
+    inputs:
+      simpleapi_version:
+        description: "SHA pour rollback simpleapi (laisser vide si vous ne voulez aps toucher)"
+        required: false
+      database_version:
+        description: "SHA pour database (laisser vide si vous ne voulez pas toucher)"
+        required: false
+      httpserver_version:
+        description: "SHA pour httpserver (laisser vide si vous ne voulez pas toucher)"
+        required: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: simpleapi
+            version: ${{ inputs.simpleapi_version }}
+          - image: database
+            version: ${{ inputs.database_version }}
+          - image: httpserver
+            version: ${{ inputs.httpserver_version }}
+    steps:
+      - name: Login to DockerHub
+        if: matrix.version != ''
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Repoint latest on ${{ matrix.image }}
+        if: matrix.version != ''
+        run: |
+          docker buildx imagetools create \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:latest \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:${{ matrix.version }}

@@ -1,0 +1,12 @@
+# Les bonus
+
+
+1. protéger la branhe main
+
+2. tag sur les versions des images
+
+3.faire des rollbacks si les tests fails
+
+4. lancer les pipelines de push sur docker que sur les pr
+
+5. owasp

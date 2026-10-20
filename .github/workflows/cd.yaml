@@ -1,0 +1,46 @@
+name: CD devops 2025
+on:
+  workflow_run:
+    workflows: ["CI devops 2025"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  build-and-push:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build and push simpleapi
+        uses: docker/build-push-action@v6
+        with:
+          context: ./simpleapi
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/simpleapi:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/simpleapi:${{ github.event.workflow_run.head_sha }}
+
+      - name: Build and push database
+        uses: docker/build-push-action@v6
+        with:
+          context: ./db
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/database:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/database:${{ github.event.workflow_run.head_sha }}
+
+      - name: Build and push httpd
+        uses: docker/build-push-action@v6
+        with:
+          context: ./http-server
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/httpserver:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/httpserver:${{ github.event.workflow_run.head_sha }}

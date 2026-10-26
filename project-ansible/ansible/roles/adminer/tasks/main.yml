@@ -1,0 +1,12 @@
+- name: Run Adminer
+  community.docker.docker_container:
+    name: adminer
+    image: adminer
+    state: started
+    restart_policy: unless-stopped
+    published_ports:
+      - "127.0.0.1:8090:8080"
+    networks:
+      - name: back-net
+  vars:
+    ansible_python_interpreter: "{{ docker_python }}"

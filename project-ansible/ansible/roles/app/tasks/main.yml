@@ -1,0 +1,17 @@
+- name: Run the backend
+  community.docker.docker_container:
+    name: backend
+    image: "{{ backend_image }}"
+    pull: true
+    state: started
+    restart_policy: unless-stopped
+    env:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database:5432/{{ postgres_db }}"
+      SPRING_DATASOURCE_USERNAME: "{{ postgres_user }}"
+      SPRING_DATASOURCE_PASSWORD: "{{ postgres_password }}"
+    networks:
+      - name: front-net
+      - name: back-net
+  vars:
+    ansible_python_interpreter: "{{ docker_python }}"
+  no_log: true

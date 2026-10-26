@@ -1,0 +1,23 @@
+- name: Run the database
+  community.docker.docker_container:
+    name: database
+    image: "{{ database_image }}"
+    pull: true
+    state: started
+    restart_policy: unless-stopped
+    env:
+      POSTGRES_DB: "{{ postgres_db }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - name: back-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ postgres_user }} -d {{ postgres_db }}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  vars:
+    ansible_python_interpreter: "{{ docker_python }}"
+  no_log: true

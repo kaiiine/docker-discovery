@@ -1,0 +1,16 @@
+- name: Run httpd
+  community.docker.docker_container:
+    name: httpd
+    image: "{{ httpd_image }}"
+    pull: true
+    state: started
+    restart_policy: unless-stopped
+    env:
+      BACKEND_HOST: "{{ backend_host }}"
+      BACKEND_PORT: "{{ backend_port | string }}"
+    published_ports:
+      - "80:80"
+    networks:
+      - name: front-net
+  vars:
+    ansible_python_interpreter: "{{ docker_python }}"

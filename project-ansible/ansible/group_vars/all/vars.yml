@@ -1,17 +1,16 @@
 dockerhub_user: kaiine
 
-# Images (celles poussées par ta CI)
+
 backend_image: "kaiine/simpleapi:latest"
 database_image: "kaiine/database:latest"
 httpd_image: "kaiine/httpserver:latest"
 front_image: "kaiine/front:latest"
 
-# Équivalent de ton .env
-postgres_db: db            # valeur de POSTGRES_DB
-postgres_user: usr         # valeur de POSTGRES_USER
-postgres_password: "pwd"
+postgres_db: db            
+postgres_user: usr         
+postgres_password: "{{ vault_postgres_password }}"
 backend_host: backend
-backend_port: 8080         # valeur de BACKEND_PORT
+backend_port: 8080         
 front_host: front
 front_port: 80
 

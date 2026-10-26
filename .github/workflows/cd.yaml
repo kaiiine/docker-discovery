@@ -15,25 +15,6 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
-
-      - name: Install Ansible
-        run: pipx install --include-deps ansible
-
-      - name: Set up SSH key
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H quentin.dufour.takima.school >> ~/.ssh/known_hosts
-
-      - name: Deploy with Ansible
-        working-directory: project-ansible/ansible
-        run: >
-          ansible-playbook -i inventories/setup.yml playbook.yml
-          -e image_tag=${{ github.event.workflow_run.head_sha }}
-
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
@@ -55,7 +36,6 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/front:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/front:${{ github.event.workflow_run.head_sha }}
 
-
       - name: Build and push database
         uses: docker/build-push-action@v6
         with:
@@ -73,3 +53,30 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/httpserver:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/httpserver:${{ github.event.workflow_run.head_sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Install Ansible
+        run: pipx install --include-deps ansible
+
+      - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H quentin.dufour.takima.school >> ~/.ssh/known_hosts
+
+      - name: Deploy with Ansible
+        working-directory: project-ansible/ansible
+        run: >
+          ansible-playbook -i inventories/setup.yml playbook.yml
+          -e image_tag=${{ github.event.workflow_run.head_sha }}

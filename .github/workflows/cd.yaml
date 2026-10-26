@@ -46,6 +46,16 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/simpleapi:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/simpleapi:${{ github.event.workflow_run.head_sha }}
 
+      - name: Build and push front
+        uses: docker/build-push-action@v6
+        with:
+          context: ./devops-front
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/front:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/front:${{ github.event.workflow_run.head_sha }}
+
+
       - name: Build and push database
         uses: docker/build-push-action@v6
         with:

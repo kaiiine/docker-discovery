@@ -15,6 +15,17 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+
+  front:
+    build: ./devops-front
+    container_name: front
+    networks:
+      - front-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+
   database:
     build: ./db
     container_name: database
@@ -39,11 +50,14 @@ services:
     environment:
       BACKEND_PORT: ${BACKEND_PORT}
       BACKEND_HOST: ${BACKEND_HOST}
+      FRONT_HOST: ${FRONT_HOST}
+      FRONT_PORT!4: ${FRONT_PORT}
     ports:
       - "80:80"
     networks:
       - front-net
     depends_on:
+      - front
       - backend
     restart: unless-stopped
 
